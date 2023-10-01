@@ -11,6 +11,7 @@ DOWNLOAD_REMOTES = {
         HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.fasta"),
+    # BWA indices
     "Homo_sapiens_assembly38.fasta.64.alt":
         HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
@@ -35,6 +36,11 @@ DOWNLOAD_REMOTES = {
         HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.fasta.64.sa"),
+    # GATK index
+    "Homo_sapiens_assembly38.dict":
+        HTTP.remote("https://storage.googleapis.com/"
+                    "genomics-public-data/resources/broad/hg38/v0/"
+                    "Homo_sapiens_assembly38.dict"),
 }
 
 rule ref_download:

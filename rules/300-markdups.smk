@@ -1,37 +1,39 @@
-rule fq2bam:
-    output:
-        bam = temp("inter/200-fq2bam/{read_group}.bam"),
-        version = "inter/200-fq2bam/{read_group}-bwa.version",
-        command = "inter/200-fq2bam/{read_group}-bwa.command",
+rule markdups_merge_ubam:
+    output: bam = temp("inter/300-markdups/merged/{read_group}.bam"),
     input:
-        fastqs = lambda wc: get_fqs_for_read_group(wc.read_group),
+        aligned = "inter/200-fq2bam/{read_group}.bam",
+        unmapped = "inter/100-fq2ubam/{read_group}.bam",
         genome = "inter/050-ref/Homo_sapiens_assembly38.fasta",
-        _genome_indices = [ \
-            f"inter/050-ref/Homo_sapiens_assembly38.fasta.64.{ext}" \
-            for ext in ["alt", "amb", "ann", "bwt", "pac", "sa"] ],
-    log: stderr = "logs/200-fq2bam/{read_group}.stderr",
-    threads: 16
+        bwa_version = "inter/200-fq2bam/{read_group}-bwa.version",
+        bwa_command = "inter/200-fq2bam/{read_group}-bwa.command",
+        _genome_indices = "inter/050-ref/Homo_sapiens_assembly38.dict",
     resources: mem_mb = 16_000,
-    # chunk_size sets a consistent chunk size rather than the default
-    # threads * 10M bases, ensuring reproducible alignments. See
-    # https://github.com/CCDG/Pipeline-Standardization/issues/2.
-    # verbose_level goes from 1 to 4 in order of increasing verbosity, but
-    # verbose level 4 leaks into stdin.
-    params: chunk_size = 100000000, verbose_level = 3,
-    # bwa mem -Y uses CIGAR soft clipping rather than hard clipping for
-    # supplementary alignments: https://github.com/SciLifeLab/Sarek/issues/770.
-    # samtools -1 is fast compression which defaults to BAM output.
-    conda: "envs/bwa.yaml"
+    conda: "envs/gatk.yaml"
     shell: """
-        set +o pipefail  # the bwa/grep/sed raises SIGPIPE somewhere
-        bwa 2>&1 | grep -e '^Version' | sed 's/Version: //' > {output.version}
-        command="bwa mem -t {threads} \
-                -K {params.chunk_size} -v {params.verbose_level}  -Y \
-                {input.genome} {input.fastqs} \
-            2> {log.stderr} | \
-            samtools view -1 > {output.bam}"
-        echo ${{command}} > {output.command}
-        bash {output.command}"""
+        gatk --java-options "-Xms{resources.mem_mb}M" MergeBamAlignment \
+            --VALIDATION_STRINGENCY SILENT \
+            --EXPECTED_ORIENTATIONS FR \
+            --ATTRIBUTES_TO_RETAIN X0 \
+            --ALIGNED_BAM {input.aligned} \
+            --UNMAPPED_BAM {input.unmapped} \
+            --REFERENCE_SEQUENCE {input.genome} \
+            --OUTPUT {output.bam} \
+            --PAIRED_RUN true \
+            --SORT_ORDER "unsorted" \
+            --IS_BISULFITE_SEQUENCE false \
+            --ALIGNED_READS_ONLY false \
+            --CLIP_ADAPTERS false \
+            --MAX_RECORDS_IN_RAM 2000000 \
+            --ADD_MATE_CIGAR true \
+            --MAX_INSERTIONS_OR_DELETIONS -1 \
+            --PRIMARY_ALIGNMENT_STRATEGY MostDistant \
+            --PROGRAM_RECORD_ID "bwamem" \
+            --PROGRAM_GROUP_NAME "bwamem" \
+            --PROGRAM_GROUP_VERSION "$(cat {input.bwa_version})" \
+            --PROGRAM_GROUP_COMMAND_LINE "$(cat {input.bwa_command})" \
+            --UNMAPPED_READ_STRATEGY COPY_TO_TAG \
+            --ALIGNER_PROPER_PAIR_FLAGS true \
+            --UNMAP_CONTAMINANT_READS true"""
 
 # Adapted from https://github.com/gatk-workflows/gatk4-data-processing (c44603c)
 #
