@@ -20,13 +20,13 @@ def look_up(lookup, query_column, query_value, db_column, expected_size):
     return db_hits_unique
 
 lookup = pd.read_csv(config["lookup_fp"], delimiter="\t")
-get_fqs_for_readgroup = lambda readgroup: \
-    look_up(lookup, "READ_GROUP", readgroup, "FQ_FILEPATH", 2)
-get_sample_name_for_readgroup = lambda readgroup: \
-    look_up(lookup, "READ_GROUP", readgroup, "SAMPLE_NAME", 1)[0]
-get_library_name_for_readgroup = lambda readgroup: \
-    look_up(lookup, "READ_GROUP", readgroup, "LIBRARY_NAME", 1)[0]
-get_platform_unit_for_readgroup = lambda readgroup: \
-    look_up(lookup, "READ_GROUP", readgroup, "PLATFORM_UNIT", 1)[0]
-get_platform_for_readgroup = lambda readgroup: \
-    look_up(lookup, "READ_GROUP", readgroup, "PLATFORM", 1)[0]
+get_fqs_for_read_group = lambda read_group: \
+    look_up(lookup, "READ_GROUP", read_group, "FQ_FILEPATH", 2)
+get_sample_name_for_read_group = lambda read_group: \
+    look_up(lookup, "READ_GROUP", read_group, "SAMPLE_NAME", 1)[0]
+get_library_name_for_read_group = lambda read_group: \
+    look_up(lookup, "READ_GROUP", read_group, "LIBRARY_NAME", 1)[0]
+get_platform_unit_for_read_group = lambda read_group: \
+    look_up(lookup, "READ_GROUP", read_group, "PLATFORM_UNIT", 1)[0]
+get_platform_for_read_group = lambda read_group: \
+    look_up(lookup, "READ_GROUP", read_group, "PLATFORM", 1)[0]

@@ -5,23 +5,23 @@
 # [2]: https://web.archive.org/web/20231001035734/https://gatk.broadinstitute.org/hc/en-us/articles/4403687183515--How-to-Generate-an-unmapped-BAM-from-FASTQ-or-aligned-BAM
 
 rule fq2ubam:
-    output: ubam = "inter/100-fq2ubam/{readgroup}.bam",
-    input: fastqs = lambda wc: get_fqs_for_readgroup(wc.readgroup),
-    log: stderr = "logs/100-fq2ubam/{readgroup}.stderr",
+    output: ubam = temp("inter/100-fq2ubam/{read_group}.bam"),
+    input: fastqs = lambda wc: get_fqs_for_read_group(wc.read_group),
+    log: stderr = "logs/100-fq2ubam/{read_group}.stderr",
     params:
         fastq = lambda _, input: input.fastqs[0],
         fastq2 = lambda _, input: input.fastqs[1],
-        sample_name = lambda wc: get_sample_name_for_readgroup(wc.readgroup),
-        library_name = lambda wc: get_library_name_for_readgroup(wc.readgroup),
+        sample_name = lambda wc: get_sample_name_for_read_group(wc.read_group),
+        library_name = lambda wc: get_library_name_for_read_group(wc.read_group),
         platform_unit = lambda wc: \
-            get_platform_unit_for_readgroup(wc.readgroup),
-        platform = lambda wc: get_platform_for_readgroup(wc.readgroup),
+            get_platform_unit_for_read_group(wc.read_group),
+        platform = lambda wc: get_platform_for_read_group(wc.read_group),
     resources: mem_mb = 16_000,
     conda: "envs/picard.yaml"
     shell: """
         export JAVA_TOOL_OPTIONS="-Xmx{resources.mem_mb}M"
         picard FastqToSam \
-            -READ_GROUP_NAME {wildcards.readgroup} \
+            -READ_GROUP_NAME {wildcards.read_group} \
             -SAMPLE_NAME {params.sample_name} \
             -LIBRARY_NAME {params.library_name} \
             -PLATFORM_UNIT {params.platform_unit} \
