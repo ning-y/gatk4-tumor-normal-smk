@@ -43,28 +43,28 @@ DOWNLOAD_REMOTES = {
                     "Homo_sapiens_assembly38.dict"),
     # BQSR databases
     "Homo_sapiens_assembly38.dbsnp138.vcf":
-        HTTP.remote("https//storage.googleapis.com/"
+        HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.dbsnp138.vcf"),
     "Mills_and_1000G_gold_standard.indels.hg38.vcf.gz":
-        HTTP.remote("https//storage.googleapis.com/"
+        HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"),
     "Homo_sapiens_assembly38.known_indels.vcf.gz":
-        HTTP.remote("https//storage.googleapis.com/"
+        HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.known_indels.vcf.gz"),
     # BQSR database indices
     "Homo_sapiens_assembly38.dbsnp138.vcf.idx":
-        HTTP.remote("https//storage.googleapis.com/"
+        HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.dbsnp138.vcf.idx"),
     "Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi":
-        HTTP.remote("https//storage.googleapis.com/"
+        HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi"),
     "Homo_sapiens_assembly38.known_indels.vcf.gz.tbi":
-        HTTP.remote("https//storage.googleapis.com/"
+        HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.known_indels.vcf.gz.tbi"),
 }
