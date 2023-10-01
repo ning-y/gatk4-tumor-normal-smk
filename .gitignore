@@ -1,0 +1,5 @@
+.snakemake
+config.yaml
+inter
+logs
+lookup.tsv

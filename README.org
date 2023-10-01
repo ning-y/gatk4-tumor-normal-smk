@@ -1,0 +1,9 @@
+#+title: gatk4-data-processing, adapted for Snakemake
+
+Adapted from [[https://github.com/gatk-workflows/gatk4-data-processing][gatk-workflows/gatk4-data-processing]] (~c44603c~) for Snakemake.
+
+* The look-up TSV file
+
+- PLATFORM_UNIT ::
+  The platform unit is used for base recalibration, and should be in the form ~{FLOWCELL_BARCODE}.{LANE}.{SAMPLE_BARCODE}~ ([[https://web.archive.org/web/20231001034910/https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups][via GATK]]).
+  Often, for Illumina sequencers, these values can be inferred from the FASTQ read names ([[https://web.archive.org/web/20231001041613/https://support.illumina.com/help/BaseSpace_OLH_009008/Content/Source/Informatics/BS/FileFormat_FASTQ-files_swBS.htm][via Illumina]]).
