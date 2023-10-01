@@ -7,6 +7,7 @@ rule markdups_merge_ubam:
         bwa_version = "inter/200-fq2bam/{read_group}-bwa.version",
         bwa_command = "inter/200-fq2bam/{read_group}-bwa.command",
         _genome_indices = "inter/050-ref/Homo_sapiens_assembly38.dict",
+    log: stderr = "logs/300-markdups/merged/{read_group}.stderr",
     resources: mem_mb = 16_000,
     conda: "envs/gatk.yaml"
     shell: """
@@ -33,7 +34,56 @@ rule markdups_merge_ubam:
             --PROGRAM_GROUP_COMMAND_LINE "$(cat {input.bwa_command})" \
             --UNMAPPED_READ_STRATEGY COPY_TO_TAG \
             --ALIGNER_PROPER_PAIR_FLAGS true \
-            --UNMAP_CONTAMINANT_READS true"""
+            --UNMAP_CONTAMINANT_READS true 2> {log.stderr}"""
+
+rule markdups_sort:
+    output:
+        bam = temp("inter/300-markdups/sorted/{read_group}.bam"),
+        bai = temp("inter/300-markdups/sorted/{read_group}.bai"),
+    input:
+        merged = "inter/300-markdups/merged/{read_group}.bam",
+        genome = "inter/050-ref/Homo_sapiens_assembly38.fasta",
+        _genome_indices = "inter/050-ref/Homo_sapiens_assembly38.dict",
+    log: stderr = "logs/300-markdups/sorted/{read_group}.stderr",
+    resources: mem_mb = 16_000,
+    conda: "envs/gatk.yaml"
+    shell: """
+        gatk --java-options "-Xms{resources.mem_mb}M" SortSam \
+                --INPUT {input.merged} \
+                --OUTPUT /dev/stdout \
+                --SORT_ORDER "coordinate" \
+                --CREATE_INDEX false \
+                --CREATE_MD5_FILE false 2>> {log.stderr} |
+            gatk --java-options "-Xms{resources.mem_mb}M" SetNmMdAndUqTags \
+                --INPUT /dev/stdin \
+                --OUTPUT {output.bam} \
+                --CREATE_INDEX true \
+                --CREATE_MD5_FILE false \
+                --REFERENCE_SEQUENCE {input.genome} 2>> {log.stderr}"""
+
+rule markdups_mark:
+    output:
+        bam = temp("inter/300-markdups/marked/{sample_name}.bam"),
+        metrics = "inter/300-markdups/marked/{sample_name}.txt",
+    input:
+        bams = lambda wc: [ f"inter/300-markdups/sorted/{read_group}.bam" \
+            for read_group in get_read_groups_for_sample_name(wc.sample_name) ],
+        _bais = lambda wc: [ f"inter/300-markdups/sorted/{read_group}.bai" \
+            for read_group in get_read_groups_for_sample_name(wc.sample_name) ],
+    log: stderr = "logs/300-markdups/marked/{sample_name}.stderr",
+    resources: mem_mb = 16_000,
+    params:
+        inputs = lambda _, input: [ f"--INPUT {bam}" for bam in input.bams ],
+    conda: "envs/gatk.yaml"
+    shell: """
+        gatk --java-options "-Xms{resources.mem_mb}M" MarkDuplicates \
+            {params.inputs} \
+            --OUTPUT {output.bam} \
+            --METRICS_FILE {output.metrics} \
+            --VALIDATION_STRINGENCY SILENT \
+            --OPTICAL_DUPLICATE_PIXEL_DISTANCE 2500 \
+            --ASSUME_SORT_ORDER "queryname" \
+            --CREATE_MD5_FILE false 2> {log.stderr}"""
 
 # Adapted from https://github.com/gatk-workflows/gatk4-data-processing (c44603c)
 #

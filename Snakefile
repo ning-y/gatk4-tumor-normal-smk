@@ -7,4 +7,4 @@ include: "rules/200-fq2bam.smk"
 include: "rules/300-markdups.smk"
 
 rule dev:
-    input: "inter/300-markdups/merged/I0005_L1.bam",
+    input: "inter/300-markdups/marked/I0005.bam",
