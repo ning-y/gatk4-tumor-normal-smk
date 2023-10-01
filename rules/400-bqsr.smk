@@ -7,7 +7,7 @@ rule bqsr_generate_model:
             for db in config["bqsr_db"].split(",") ],
         _genome_indices = "inter/050-ref/Homo_sapiens_assembly38.dict",
         _known_sites_indices = [ f"inter/050-ref/{db_idx}" \
-            for db in config["bqsr_db_idx"].split(",") ],
+            for db_idx in config["bqsr_db_idx"].split(",") ],
     resources: mem_mb = 16_000,
     params: known_sites = lambda _, input: [ \
         f"--known-sites {vcf}" for vcf in input.known_sites ]
