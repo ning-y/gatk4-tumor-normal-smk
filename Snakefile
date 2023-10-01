@@ -5,6 +5,8 @@ include: "rules/050-ref.smk"
 include: "rules/100-fq2ubam.smk"
 include: "rules/200-fq2bam.smk"
 include: "rules/300-markdups.smk"
+include: "rules/400-bqsr.smk"
 
 rule dev:
-    input: "inter/300-markdups/marked/I0005.bam",
+    input:
+        "inter/400-bqsr/I0005.recal_data.csv",

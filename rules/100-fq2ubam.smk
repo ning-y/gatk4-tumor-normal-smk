@@ -17,14 +17,13 @@ rule fq2ubam:
             get_platform_unit_for_read_group(wc.read_group),
         platform = lambda wc: get_platform_for_read_group(wc.read_group),
     resources: mem_mb = 16_000,
-    conda: "envs/picard.yaml"
+    conda: "envs/gatk.yaml"
     shell: """
-        export JAVA_TOOL_OPTIONS="-Xmx{resources.mem_mb}M"
-        picard FastqToSam \
-            -READ_GROUP_NAME {wildcards.read_group} \
-            -SAMPLE_NAME {params.sample_name} \
-            -LIBRARY_NAME {params.library_name} \
-            -PLATFORM_UNIT {params.platform_unit} \
-            -PLATFORM {params.platform} \
-            -FASTQ {params.fastq} -FASTQ2 {params.fastq2} \
-            -OUTPUT {output.ubam} 2> {log.stderr}"""
+        gatk --java-options "-Xms{resources.mem_mb}M" FastqToSam \
+            --READ_GROUP_NAME {wildcards.read_group} \
+            --SAMPLE_NAME {params.sample_name} \
+            --LIBRARY_NAME {params.library_name} \
+            --PLATFORM_UNIT {params.platform_unit} \
+            --PLATFORM {params.platform} \
+            --FASTQ {params.fastq} -FASTQ2 {params.fastq2} \
+            --OUTPUT {output.ubam} 2> {log.stderr}"""
