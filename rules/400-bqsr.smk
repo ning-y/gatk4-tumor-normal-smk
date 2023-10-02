@@ -5,9 +5,11 @@ rule bqsr_generate_model:
         genome = "inter/050-ref/Homo_sapiens_assembly38.fasta",
         known_sites = [ f"inter/050-ref/{db}" \
             for db in config["bqsr_db"].split(",") ],
-        _genome_indices = "inter/050-ref/Homo_sapiens_assembly38.dict",
+        _genome_indices = [ f"inter/050-ref/Homo_sapiens_assembly38.{ext}" \
+            for ext in ["dict", "fasta.fai"] ],
         _known_sites_indices = [ f"inter/050-ref/{db_idx}" \
             for db_idx in config["bqsr_db_idx"].split(",") ],
+    log: stderr = "logs/400-bqsr/{sample_name}.recal_data.stderr",
     resources: mem_mb = 16_000,
     params: known_sites = lambda _, input: [ \
         f"--known-sites {vcf}" for vcf in input.known_sites ]
@@ -18,7 +20,7 @@ rule bqsr_generate_model:
             --input {input.sorted} \
             --use-original-qualities \
             --output {output.report} \
-            {params.known_sites}"""
+            {params.known_sites} 2> {log.stderr}"""
 
 # Adapted from https://github.com/gatk-workflows/gatk4-data-processing (c44603c)
 #

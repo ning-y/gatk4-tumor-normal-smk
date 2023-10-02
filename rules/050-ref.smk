@@ -36,6 +36,11 @@ DOWNLOAD_REMOTES = {
         HTTP.remote("https://storage.googleapis.com/"
                     "genomics-public-data/resources/broad/hg38/v0/"
                     "Homo_sapiens_assembly38.fasta.64.sa"),
+    # samtools index
+    "Homo_sapiens_assembly38.fasta.fai":
+        HTTP.remote("https://storage.googleapis.com/"
+                    "genomics-public-data/resources/broad/hg38/v0/"
+                    "Homo_sapiens_assembly38.fasta.fai"),
     # GATK index
     "Homo_sapiens_assembly38.dict":
         HTTP.remote("https://storage.googleapis.com/"

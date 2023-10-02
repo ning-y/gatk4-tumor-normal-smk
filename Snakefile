@@ -8,5 +8,4 @@ include: "rules/300-markdups.smk"
 include: "rules/400-bqsr.smk"
 
 rule dev:
-    input:
-        "inter/400-bqsr/I0005.recal_data.csv",
+    input: "inter/400-bqsr/BC042.recal_data.csv",
