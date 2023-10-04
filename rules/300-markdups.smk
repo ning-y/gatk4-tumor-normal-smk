@@ -64,6 +64,7 @@ rule markdups_sort:
 rule markdups_mark:
     output:
         bam = temp("inter/300-markdups/marked/{sample_name}.bam"),
+        bai = temp("inter/300-markdups/marked/{sample_name}.bai"),
         metrics = "inter/300-markdups/marked/{sample_name}.txt",
     input:
         bams = lambda wc: [ f"inter/300-markdups/sorted/{read_group}.bam" \
@@ -75,6 +76,7 @@ rule markdups_mark:
     params:
         inputs = lambda _, input: [ f"--INPUT {bam}" for bam in input.bams ],
     conda: "envs/gatk.yaml"
+    # I couldn't get --CREATE_INDEX true to create an index.
     shell: """
         gatk --java-options "-Xms{resources.mem_mb}M" MarkDuplicates \
             {params.inputs} \
@@ -82,8 +84,8 @@ rule markdups_mark:
             --METRICS_FILE {output.metrics} \
             --VALIDATION_STRINGENCY SILENT \
             --OPTICAL_DUPLICATE_PIXEL_DISTANCE 2500 \
-            --ASSUME_SORT_ORDER "queryname" \
-            --CREATE_MD5_FILE false 2> {log.stderr}"""
+            --ASSUME_SORT_ORDER "queryname" 2> {log.stderr}
+        samtools index {output.bam} {output.bai}"""
 
 # Adapted from https://github.com/gatk-workflows/gatk4-data-processing (c44603c)
 #

@@ -22,6 +22,30 @@ rule bqsr_generate_model:
             --output {output.report} \
             {params.known_sites} 2> {log.stderr}"""
 
+rule bqsr_apply:
+    output: bam = "inter/400-bqsr/{sample_name}.bam",
+    input:
+        bam = "inter/300-markdups/marked/{sample_name}.bam",
+        bai = "inter/300-markdups/marked/{sample_name}.bai",
+        report = "inter/400-bqsr/{sample_name}.recal_data.csv",
+        genome = "inter/050-ref/Homo_sapiens_assembly38.fasta",
+        _genome_indices = [ f"inter/050-ref/Homo_sapiens_assembly38.{ext}" \
+            for ext in ["dict", "fasta.fai"] ],
+    log: stderr = "logs/400-bqsr/{sample_name}.recal.stderr",
+    resources: mem_mb = 16_000,
+    conda: "envs/gatk.yaml"
+    shell: """
+        gatk --java-options "-Xms{resources.mem_mb}M" ApplyBQSR \
+            --reference {input.genome} \
+            --input {input.bam} \
+            --output {output.bam} \
+            --bqsr-recal-file {input.report} \
+            --static-quantized-quals 10 \
+            --static-quantized-quals 20 \
+            --static-quantized-quals 30 \
+            --add-output-sam-program-record \
+            --use-original-qualities 2> {log.stderr}"""
+
 # Adapted from https://github.com/gatk-workflows/gatk4-data-processing (c44603c)
 #
 # BSD 3-Clause License
